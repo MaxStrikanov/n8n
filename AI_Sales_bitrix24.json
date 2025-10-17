@@ -1,0 +1,819 @@
+{
+  "name": "AI Sales (reinforced) + bitrix24 (готово)",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -860,
+        400
+      ],
+      "id": "c057248f-b69e-4d04-8bfc-624a46b650f9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=**Роль**\n\nВы - профессиональный AI-менеджер по продаже квартир в жилом комплексе «Авиатор». Ваша основная задача - провести клиента через все этапы воронки продаж и подвести его к решению записаться на презентацию (просмотр квартиры), которую проводит живой менеджер. Вы также должны получить контакт клиента, чтобы согласовать дату и время встречи.\n\n**Доступные инструменты**.\n\n- base - для получения информации о ЖК: особенности, преимущества, УТП, инфраструктура.\n- flats - для получения актуальных данных о квартирах: цены, планировки, этажи, отделка, тип.\n\n**Этапы воронки продаж**\n\n1. Установить контакт - представиться, уточнить интерес клиента.\n 2. Выявление потребностей - задайте вопросы о параметрах квартиры.\n 3. Презентация ЖК - акцентируйте внимание на УТП, увяжите его с потребностями клиента.\n 4. Работа с возражениями - мягко убеждайте, предлагайте презентацию.\n 5. Закрытие - возьмите номер и договоритесь о встрече с менеджером.\n\n**Правила общения**\n\n- Общайтесь уверенно, дружелюбно, лаконично и по существу.\n - Не пишите \\n и **.\n - Не предлагайте сразу список квартир - сначала задайте вопросы.\n - Не говорите «готов к заселению» - используйте «дом сдан, ключи в день покупки».\n - Не упоминайте о закрытом поселке - его еще не существует.\n - Менеджер: Лия +7-999-000-12-12-12 - упоминайте только в случае отсутствия контактов.\n**Пример диалога**\n\nКлиент: Здравствуйте, подскажите, пожалуйста, какие у вас есть квартиры?\n Бот: Здравствуйте! 👋 Меня зовут Валли, я помогу вам подобрать идеальный вариант в жилом комплексе «Авиатор». Скажите, пожалуйста, вы ищете квартиру для себя или для инвестиций?\n\n Клиент: Для себя.\n Бот: Отлично! Тогда я уточню пару моментов. Сколько комнат вы рассматриваете? Есть ли у вас бюджет или этаж?\n\n Клиент: Две комнаты до 6 млн, этаж не выше 5-го.\n Бот: Сейчас проверю по базе 🔍.\n Наш ЖК «Авиатор» - это малоэтажный кирпичный дом в тихом районе. Дом уже сдан, ключи вы получаете в день покупки. По вашему запросу доступна квартира на 4 этаже, площадью 58 м², по цене 5 850 000 ₽. Хотите узнать больше или увидеть ее на встрече с менеджером?\n\n Клиент: Какая инфраструктура находится поблизости?\n Бот: Приморский парк - в 1 минуте ходьбы, магазины, школа и детский сад рядом. Удобный выезд в центр и к морю. Все это вы сможете увидеть лично на презентации. Когда вам будет удобно? Я передам контакты менеджеру для согласования времени.\n\n Клиент: Кто проводит презентацию?\n Бот: Менеджер Лия - она покажет квартиру и расскажет все подробности. Пожалуйста, оставьте свой номер телефона - мы свяжемся с вами и согласуем время.\n\n Клиент: +7-900-123-45-67\n Бот: Отлично, спасибо 🙏 Я передам ваш контакт менеджеру. С вами свяжутся в самое ближайшее время! Если у вас возникнут вопросы - я всегда на связи 💬\n\n**Дополнительный демонстрационный диалог по воронке продаж**\n\nКлиент: Здравствуйте, подскажите, пожалуйста, какие квартиры у вас есть в наличии?\nБот (устанавливает контакт):\n Здравствуйте 👋 Меня зовут Валли, я помогу вам найти идеальный вариант в ЖК «Авиатор». Скажите, пожалуйста, вы ищете квартиру для себя или для инвестиций?\n\nКлиент: Для себя.\nБот (выявляя потребности):\n Отлично! Тогда я уточню пару моментов, чтобы помочь вам найти подходящие варианты. Сколько комнат вы рассматриваете? Есть пожелания по бюджету или этажу?\n\nКлиент: Две комнаты до 6 млн, этаж не выше 5-го.\nБот (подбор + презентация ЖК):\n Спасибо! Теперь я посмотрю базу данных. \nНаш ЖК «Авиатор» - это малоэтажный кирпичный дом в тихом районе. Дом уже сдан, ключи вы получаете в день покупки.\n Квартира на 4 этаже, площадью 58 м², по цене 5 850 000 ₽ доступна по вашему запросу.\n Хотите узнать больше или увидеть ее на встрече с менеджером?\n\nКлиент: А что находится рядом из инфраструктуры?\nБот:\n Недалеко от ЖК находятся:\n - Приморский парк - 1 минута ходьбы,\n - Магазины, школа и детский сад - все в шаговой доступности,\n - Удобный выезд в центр и к морю.\n Все это вы сможете увидеть лично на небольшой презентации. Когда вам будет удобно? Я передам контакты менеджеру для согласования времени.\n\nКлиент: А кто проводит презентацию?\nБот (завершая встречу):\n Презентацию проводит менеджер Лия - она покажет квартиру, расскажет подробности и ответит на все ваши вопросы.\n Оставьте, пожалуйста, свой номер телефона - мы свяжемся с вами и согласуем удобное время.\n\nКлиент: +7-900-123-45-67\nБот:\n Отлично, спасибо 🙏 Передаю ваши контакты менеджеру. С вами свяжутся в самое ближайшее время! Если есть еще вопросы - я всегда на связи 💬.\n\n**Дополнительные заметки**.\nНе спешите выкладывать всю информацию - сначала вовлеките клиента, задавайте вопросы.\nГлавная цель - перевести интерес в просмотр (встречу).\nЕсли сомневаетесь - успокойте и предложите просто «ознакомиться поближе».\nУпоминайте менеджера Лию и номер +7-999-000-12-12 только в том случае, если клиент не хочет давать контакт.\n**📍Когда клиент отправил имя и номер телефона:\n\n1. Сохрани в память:  \ncontactSent = true\n\n2. Ответь клиенту одним сообщением:  \nСпасибо, {{имя}}! 🙏 Я передал ваши контакты менеджеру. С вами свяжутся в ближайшее время, чтобы согласовать встречу.\n\n3. Вызови инструмент sendLeadToB24 с параметрами:\nname — имя клиента (если удалось получить),  \nphone — номер телефона (если удалось получить),  \nsource — Telegram,  \ncomment — Лид с бота. Интересовался ЖК «Авиатор»\n\n4. Заверши диалог — больше не пиши, если клиент не задаёт вопрос."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -860,
+        160
+      ],
+      "id": "4381d70c-cdd4-4f74-8b25-a933eea18788",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -980,
+        400
+      ],
+      "id": "4fdfd0a5-eb72-4b6d-bf08-d001cc6ebf04",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1o2op5WQEZdAr_UevkEtTSeVjpVMH8nhJAQMZZZnywaM/edit?usp=drive_link"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        400
+      ],
+      "id": "af04232d-646b-4179-95f1-0f97ef5b66f4",
+      "name": "base",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "aMSZlMQmImV0pGX3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw",
+          "mode": "list",
+          "cachedResultName": "база по квартирам",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -600,
+        400
+      ],
+      "id": "a9b1b1be-6149-45e8-a5d7-a981e783f414",
+      "name": "flats",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6Aab91tCHlrRwym7",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1660,
+        180
+      ],
+      "id": "d7dc23b9-a5f8-435a-90c2-23c44ac53f70",
+      "name": "Telegram Trigger",
+      "webhookId": "cad9862d-d94c-4b03-8f53-457a3f5a7159",
+      "credentials": {
+        "telegramApi": {
+          "id": "qRr4PJthKcg2oz4M",
+          "name": "AI_Sales"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{/(\\+7|8)[\\s\\-]?\\(?\\d{3}\\)?[\\s\\-]?\\d{3}[\\s\\-]?\\d{2}[\\s\\-]?\\d{2}/.test($json[\"Фраза клиента\"])\n}}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -380,
+        160
+      ],
+      "id": "c5a52d5d-1b68-4aa3-948a-86d5bd8af4e8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json[\"ID клиента\"] || $json[\"chat\"][\"id\"] }}",
+        "text": "=Спасибо, {{ $json[\"Фраза клиента\"].match(/[А-ЯЁA-Z][а-яёa-z]+/g)?.[0] || 'друг' }}! 🙏 Я записал ваш номер. Менеджер Лия свяжется с вами в ближайшее время, чтобы согласовать удобное время для презентации. Если у вас будут дополнительные вопросы, не стесняйтесь обращаться!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -120,
+        540
+      ],
+      "id": "b61d3b7d-782b-48f6-827b-e0fba1c722cf",
+      "name": "ThankYouMessage",
+      "webhookId": "9b8d71d9-0a33-4e36-bcb5-601f3bc46d70",
+      "credentials": {
+        "telegramApi": {
+          "id": "qRr4PJthKcg2oz4M",
+          "name": "AI_Sales"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ce7f414-8be9-4803-a8ee-8d4c57327f68",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Текст"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "27f4bad9-8b9b-4070-b2e5-12e74e0078b4",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Голосовое"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1500,
+        180
+      ],
+      "id": "a3d7be45-20f7-4500-8e85-36fb2464a523",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1120,
+        240
+      ],
+      "id": "4dce1a60-9393-4a1c-a9d4-297dded07024",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        240
+      ],
+      "id": "a2a67531-4442-4d3d-a83f-730ff24c9c52",
+      "name": "Голосовое",
+      "webhookId": "70ef3776-a588-4339-8081-c0786d476047",
+      "credentials": {
+        "telegramApi": {
+          "id": "qRr4PJthKcg2oz4M",
+          "name": "AI_Sales"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc",
+          "mode": "list",
+          "cachedResultName": "Логи",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата и время": "={{ $now }}",
+            "ID клиента": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "username": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+            "Фраза клиента": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "Фраза бота": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Дата и время",
+              "displayName": "Дата и время",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID клиента",
+              "displayName": "ID клиента",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Фраза клиента",
+              "displayName": "Фраза клиента",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Фраза бота",
+              "displayName": "Фраза бота",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -540,
+        160
+      ],
+      "id": "bb76593c-ff42-4101-b256-3b82547b3845",
+      "name": "Запись диалогов",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6Aab91tCHlrRwym7",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://b24-yquxin.bitrix24.ru/rest/1/w2rbjkntape2belw/crm.lead.add.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"fields\": {\n    \"TITLE\": \"{{ $('Information Extractor').item.json.output.name }}\",\n    \"NAME\": \"{{ $('Information Extractor').item.json.output.name }}\",\n    \"PHONE\": [{\n      \"VALUE\": \"{{ $('Information Extractor').item.json.output.phone }}\",\n      \"VALUE_TYPE\": \"WORK\"\n    }],\n    \"SOURCE_ID\": \"WEB\",\n    \"COMMENTS\": \"{{ $json.output }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        120
+      ],
+      "id": "98d9679b-a918-4bd5-bace-1a7cfbe72255",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        120
+      ],
+      "id": "2d21d534-96fd-4dfb-85b9-575bb01cd0b8",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -120,
+        -80
+      ],
+      "id": "25f0129f-63e2-4f7e-9367-eb5f4a859ac3",
+      "name": "ответ клиенту",
+      "webhookId": "9559f24c-654c-4bd3-aa5e-5e5963027adf",
+      "credentials": {
+        "telegramApi": {
+          "id": "qRr4PJthKcg2oz4M",
+          "name": "AI_Sales"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        520
+      ],
+      "id": "43f44bf2-ff63-49eb-b750-5d834245933b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const namePhoneRow = items.find(i => i.json[\"Фраза клиента\"]?.match(/(\\+7|8)\\s?[\\d\\-\\(\\) ]{10,}/));\nconst namePhone = namePhoneRow?.json[\"Фраза клиента\"] ?? \"Имя и телефон не указаны\";\n\nconst summary = items\n  .map(i => `👤 Клиент: ${i.json[\"Фраза клиента\"]}\\n🤖 Бот: ${i.json[\"Фраза бота\"]}`)\n  .join('\\n\\n');\n\nreturn [\n  {\n    json: {\n      message: `📬 Новая заявка от клиента!\\n\\n👤 ${namePhone}\\n\\n🗨️ Диалог:\\n\\n${summary}`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        340
+      ],
+      "id": "169ab88a-d862-469b-9310-e1ef660e1dd5",
+      "name": "сбор диалога"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=Сформулируй краткий комментарий для CRM. Укажи имя клиента, его интерес (например: интересуется покупкой квартиры с 2 комнатами до 7 млн ₽), планируемое действие (например: хочет приехать на презентацию). Пиши от третьего лица. Стиль: деловой, краткий (1-2 предложения).\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        240,
+        340
+      ],
+      "id": "073e0483-45ee-476b-b227-6060ae7594fe",
+      "name": "пишем коммент для Б24"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc",
+          "mode": "list",
+          "cachedResultName": "Логи",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JtKngEofxnG0prs7FAFg3-mLV5xLXLQ3Tx3aJowbFvc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID клиента",
+              "lookupValue": "={{ $json['ID клиента'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -120,
+        340
+      ],
+      "id": "957d0439-6d8b-480a-8348-298c4c0b182b",
+      "name": "чтение диалога",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6Aab91tCHlrRwym7",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['Фраза клиента'] }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "name",
+              "description": "Имя упомянутое в сообщении"
+            },
+            {
+              "name": "phone",
+              "description": "номер телефона"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        100
+      ],
+      "id": "2a1abf46-208d-461c-afe4-08cd79295aaf",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -120,
+        220
+      ],
+      "id": "5df08153-7580-4296-acc1-3cb8840e6a2e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Запись диалогов",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "flats": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "ответ клиенту",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "чтение диалога",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ThankYouMessage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Голосовое",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Голосовое": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Запись диалогов": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "пишем коммент для Б24",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "сбор диалога": {
+      "main": [
+        [
+          {
+            "node": "пишем коммент для Б24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "пишем коммент для Б24": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "чтение диалога": {
+      "main": [
+        [
+          {
+            "node": "сбор диалога",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "99b15ef6-9ea2-49fb-944c-ef2bf4521417",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ada85f352adc11402aecccfa9e807980424bd3ca1142ded7a4f80efc1d02cbf9"
+  },
+  "id": "hOb4JyYUw3k5cd9r",
+  "tags": []
+}

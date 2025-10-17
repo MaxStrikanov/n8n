@@ -1,0 +1,770 @@
+{
+  "name": "supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -2260,
+        3240
+      ],
+      "id": "da156bd6-d259-4460-818f-aeae2321bac8",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "aMSZlMQmImV0pGX3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a4acfe5-95a1-4919-954f-ee1132dcb78f",
+              "name": " content",
+              "value": "={{ $('разбивка на фрагменты 2').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "0e81a9a9-a3c9-4778-b656-ef7312c837ff",
+              "name": "embedding",
+              "value": "={{ $json.data[0].embedding }}",
+              "type": "string"
+            },
+            {
+              "id": "58754103-e195-4f6d-b017-6bb42c28400f",
+              "name": "metadata",
+              "value": "{}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1660,
+        3240
+      ],
+      "id": "7e0b1005-b1ed-4059-b4fa-5deb77d469a2",
+      "name": "форматирование перед вставкой"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "book2_content",
+          "mode": "list",
+          "cachedResultName": "book2_content"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        -1660,
+        3440
+      ],
+      "id": "c65a9b55-7864-499f-8d6f-0a3901fb0f47",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nxW16hYX3wcbzemb",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 1500,
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -1620,
+        3780
+      ],
+      "id": "871495b2-4871-411a-9ce2-fb4a6bc42222",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -2260,
+        3440
+      ],
+      "id": "7ae74f99-34d8-4d9f-965e-0c0fde82b9ab",
+      "name": "Google Drive2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "m6GmznvHtnJ5hEiK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        3440
+      ],
+      "id": "78d10d93-a67a-4b3b-a522-45750c614ec5",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        3620
+      ],
+      "id": "45127077-9873-4411-ade4-1cd13b9f0759",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1740,
+        3620
+      ],
+      "id": "6d6e381f-b03b-4e10-9fbf-78f542f93129",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw",
+          "mode": "list",
+          "cachedResultName": "база по квартирам",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1EFm0p5ZONAFyZNK-nzuhn4i5E1vHJd3CML943MNSDEw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2260,
+        3040
+      ],
+      "id": "d8e5d861-0863-431d-9636-08f8bcd615be",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1d4V2pAT7r5GW25zuJj5sUhTW2Xwn4pL1",
+          "mode": "list",
+          "cachedResultName": "Автозагрузка supa",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1d4V2pAT7r5GW25zuJj5sUhTW2Xwn4pL1"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3000,
+        3220
+      ],
+      "id": "bd582369-2364-4c53-9a57-095cf7d7ea89",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "m6GmznvHtnJ5hEiK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "application/vnd.google-apps.spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "41bbe248-4da5-47b6-a70c-1df2f1656771"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sheet"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3aaf5a3f-e0e5-400e-a256-f05f1dfeabbf",
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": ".xlsx"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3feaba92-b39e-47e1-9ce8-93574a194b7c",
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "application/vnd.google-apps.document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "doc"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2a5ff335-eea0-42b1-9fad-7fcf6049291b",
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2560,
+        3200
+      ],
+      "id": "edd47128-2bbd-4373-961d-5fbc82f0542a",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "model",
+              "value": "text-embedding-ada-002"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1860,
+        3240
+      ],
+      "id": "1d9e2a9d-ddf7-4682-9434-330e8c770a3f",
+      "name": "OpenAI Embedding 2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": \"{{$json['content']}}\",\n  \"model\": \"text-embedding-ada-002\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1820,
+        3040
+      ],
+      "id": "5a494322-d101-4e3d-b081-1e0b514cecd0",
+      "name": "OpenAI Embedding"
+    },
+    {
+      "parameters": {
+        "tableId": "universal222_docs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('разбивка на фрагменты').item.json.content }}"
+            },
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.data[0].embedding }}"
+            },
+            {
+              "fieldId": "metadata"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        3040
+      ],
+      "id": "70a34815-d891-4e76-8c38-dd8d2a5ec354",
+      "name": "universal222_docs",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nxW16hYX3wcbzemb",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "universal111_docs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('разбивка на фрагменты 2').item.json.content }}"
+            },
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.embedding }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ $json.metadata }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        3240
+      ],
+      "id": "f5930c45-2d00-4ee8-b072-fa2bc26605bd",
+      "name": "universal_docs",
+      "credentials": {
+        "supabaseApi": {
+          "id": "nxW16hYX3wcbzemb",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const data = item.json;\n    const parts = [];\n\n    for (const [key, value] of Object.entries(data)) {\n        parts.push(`${key}: ${value}`);\n    }\n\n    const content = parts.join(', ');\n\n    return {\n        json: {\n            content,\n            original: data\n        }\n    };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2040,
+        3040
+      ],
+      "id": "b4d46b3c-d2dd-4ce1-9dad-8e3c155add39",
+      "name": "разбивка на фрагменты"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json[\"id\"] }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2780,
+        3220
+      ],
+      "id": "c2dc1867-5031-44a9-8e9f-b379631f02ec",
+      "name": "Получение метаданных файла",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "JEhSC6OWo7aKXyqo",
+          "name": "http google drive api"
+        },
+        "googleDriveOAuth2Api": {
+          "id": "m6GmznvHtnJ5hEiK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fullText = $json.text;\nconst parts = fullText.split(/\\n{2,}/); // разбивка по пустым строкам\n\nreturn parts.map((chunk, index) => ({\n  json: {\n    id: index + 1,\n    content: chunk.trim()\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1900,
+        3440
+      ],
+      "id": "4699f9de-54ca-411c-9f37-effe925f6052",
+      "name": "разбивка на фрагменты 3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.content;\nconst chunkSize = 1000;\nconst overlap = 100;\n\nlet result = [];\n\nfor (let i = 0; i < text.length; i += chunkSize - overlap) {\n  const chunk = text.slice(i, i + chunkSize);\n  result.push({\n    json: {\n      content: chunk.trim()\n    }\n  });\n}\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2060,
+        3240
+      ],
+      "id": "2a0a057a-447e-44f2-9c9b-a5f3e8d2d3e6",
+      "name": "разбивка на фрагменты 2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "разбивка на фрагменты 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "форматирование перед вставкой": {
+      "main": [
+        [
+          {
+            "node": "universal_docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "разбивка на фрагменты 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "разбивка на фрагменты",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Получение метаданных файла",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding 2": {
+      "main": [
+        [
+          {
+            "node": "форматирование перед вставкой",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding": {
+      "main": [
+        [
+          {
+            "node": "universal222_docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "разбивка на фрагменты": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение метаданных файла": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "разбивка на фрагменты 3": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "разбивка на фрагменты 2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embedding 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8076843e-68a6-4759-aecb-fdae653d3185",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ada85f352adc11402aecccfa9e807980424bd3ca1142ded7a4f80efc1d02cbf9"
+  },
+  "id": "IF0tynNu2PQ8iwYh",
+  "tags": []
+}

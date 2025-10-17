@@ -1,0 +1,1326 @@
+{
+  "name": "hr avito (расширенный)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        0
+      ],
+      "id": "dcc31ef7-3b44-4a13-b212-be9edc70e1be",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0",
+          "mode": "list",
+          "cachedResultName": "avito",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 241510000,
+          "mode": "list",
+          "cachedResultName": "резюме",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit#gid=241510000"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "оценка"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "id": "efbac433-d8a0-41ec-95db-78c3b8da74fc",
+      "name": "чтение информации",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6e7c085d-f2dd-4e91-8fc9-3227b23ac6b7",
+              "leftValue": "={{ $json['оценка'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e60f1755-de25-49ea-b17b-1727c7dcd87d",
+              "leftValue": "={{ $json['оценка'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "dd91929c-028a-4eeb-b19c-dbf6136aeadb",
+      "name": "отбор непросмотренного"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{$json[\"ссылка\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        60
+      ],
+      "id": "dc24d03b-ccc3-487f-8b4a-dfc21372821f",
+      "name": "сбор инфы"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=Вакансия: Менеджер по продажам\n\nТребования к кандидату:\n- Опыт активных продаж от 1 года\n- Навыки ведения переговоров и работы с возражениями\n- Умение работать с CRM-системами (Битрикс24, amoCRM и др.)\n- Уверенное пользование Excel/Google Таблицами\n- Развитые коммуникативные навыки\n- Нацеленность на результат, способность закрывать сделки\n- Грамотная письменная и устная речь\n\nНиже приведена структурированная информация из резюме кандидата:\n\nИмя: {{ $json.output[\"Имя\"] || \"не указано\" }}\nГород: {{ $json.output[\"Город\"] || \"не указано\" }}\nОбразование: {{ $json.output[\"Образование\"] || \"не указано\" }}\nОпыт работы: {{ $json.output[\"Опыт работы\"] || \"не указано\" }}\nНавыки: {{ $json.output[\"Навыки\"] || \"не указано\" }}\nДоп. сведения: {{ $json.output[\"Доп. сведения\"] || \"не указано\" }}\n\nПроанализируй, насколько кандидат соответствует этой вакансии по 10-балльной шкале.\n\nВерни **строго валидный JSON** (без markdown, без ```json), строго в этом виде:\n{\n  \"score\": 0-10,\n  \"comment\": \"Краткий комментарий по соответствию: какие пункты из требований соблюдены, каких не хватает.\",\n  \"invite\": \"ДА\" или \"Нет\" // Если score > 5 — верни \"ДА\", иначе \"Нет\"\n}\n\n⚠️ ВАЖНО: верни **только чистый JSON**, без markdown, без кавычек, не как строку. Просто валидный JSON-объект.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1340,
+        60
+      ],
+      "id": "72ed55bf-4629-4b81-960f-b9dac52f2e5f",
+      "name": "Анализ на соответствие вакансии"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0",
+          "mode": "list",
+          "cachedResultName": "avito",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 241510000,
+          "mode": "list",
+          "cachedResultName": "резюме",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit#gid=241510000"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "оценка": "={{ $json.output.score }}",
+            "выводы": "={{ $json.output.comment }}",
+            "row_number": "={{ $('по 1 строкe').item.json.row_number }}",
+            "отправить приглашение": "={{ $json.output['отправить приглашение'] }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "№",
+              "displayName": "№",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ссылка",
+              "displayName": "ссылка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "должность",
+              "displayName": "должность",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "зп",
+              "displayName": "зп",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "оценка",
+              "displayName": "оценка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "выводы",
+              "displayName": "выводы",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "отправить приглашение",
+              "displayName": "отправить приглашение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "персональное сообщение",
+              "displayName": "персональное сообщение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "скачано резюме",
+              "displayName": "скачано резюме",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2020,
+        60
+      ],
+      "id": "7c779a34-c37a-4bd6-ab2d-891689d0de77",
+      "name": "Запись результата",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0",
+          "mode": "list",
+          "cachedResultName": "avito",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 241510000,
+          "mode": "list",
+          "cachedResultName": "резюме",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit#gid=241510000"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Чтение таблицы').item.json.row_number }}",
+            "персональное сообщение": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "№",
+              "displayName": "№",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ссылка",
+              "displayName": "ссылка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "должность",
+              "displayName": "должность",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "зп",
+              "displayName": "зп",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "оценка",
+              "displayName": "оценка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "выводы",
+              "displayName": "выводы",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "отправить приглашение",
+              "displayName": "отправить приглашение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "персональное сообщение",
+              "displayName": "персональное сообщение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "скачано резюме",
+              "displayName": "скачано резюме",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1020,
+        320
+      ],
+      "id": "d0de2b24-7dec-438e-8642-64c1067f4de3",
+      "name": "запись",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $('Чтение таблицы').item.json['ссылка'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "6693537f-70bc-4c78-8041-2c7a100770f4",
+      "name": "считывание резюме"
+    },
+    {
+      "parameters": {
+        "folderId": "1W3pG-99X2UKB-8VR1q2gUmDd6QQfvNIa",
+        "title": "={{ $('Чтение таблицы').item.json['должность'] }}{{ $('Чтение таблицы').item.json['зп'] }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        320
+      ],
+      "id": "2127b753-65ff-4007-aa37-e5802f4a4a40",
+      "name": "создание док-а",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "aMSZlMQmImV0pGX3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('создание док-а').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('читаемый вид1').item.json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        540
+      ],
+      "id": "dcfc7990-4a71-4eb0-9bc8-eafa9a4d34a9",
+      "name": "запись в док",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "aMSZlMQmImV0pGX3",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0",
+          "mode": "list",
+          "cachedResultName": "avito",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 241510000,
+          "mode": "list",
+          "cachedResultName": "резюме",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit#gid=241510000"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        260,
+        320
+      ],
+      "id": "93cb7be1-c995-4dd2-bfc9-91aa377e67b2",
+      "name": "Чтение таблицы",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        460
+      ],
+      "id": "29fd5a70-fb86-41fc-8e77-6ba5f4948b06",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        820,
+        680
+      ],
+      "id": "2d07d23c-60a8-427c-be0f-f3e794698475",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "=Ты HR-помощник. На входе — неструктурированный текст резюме, выгруженный с сайта.  Отформатируй информацию в понятный, аккуратный и структурированный вид, удобный для чтения.  Сделай блоки: - 👤 Имя и должность - 📍 Город, возраст, пол - 🎓 Образование - 💼 Опыт работы (последние 3 места, начиная с последнего) - 🧠 Навыки и сильные стороны (если упоминаются) - 📌 Дополнительная информация (если есть)  Оформляй результат в виде читаемого текста для HR, без markdown и json. Убери мусор, повторения и технические вставки."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        880,
+        540
+      ],
+      "id": "97f8fbdb-dd59-4162-98ae-37572be8474a",
+      "name": "читаемый вид1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0",
+          "mode": "list",
+          "cachedResultName": "avito",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 241510000,
+          "mode": "list",
+          "cachedResultName": "резюме",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jprnNzzs8tsaqInKxY41wnNskmRcPYgkOuct1eD2iB0/edit#gid=241510000"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "скачано резюме": "=https://docs.google.com/document/d/{{ $('создание док-а').item.json.id }}",
+            "row_number": "={{ $('Чтение таблицы').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "№",
+              "displayName": "№",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ссылка",
+              "displayName": "ссылка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "должность",
+              "displayName": "должность",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "зп",
+              "displayName": "зп",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "оценка",
+              "displayName": "оценка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "выводы",
+              "displayName": "выводы",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "отправить приглашение",
+              "displayName": "отправить приглашение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "персональное сообщение",
+              "displayName": "персональное сообщение",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "скачано резюме",
+              "displayName": "скачано резюме",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1440,
+        540
+      ],
+      "id": "b37bdc20-3fd1-456d-9805-f80fedcee556",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TxsMkgUaxjSLC8qB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1440,
+        320
+      ],
+      "id": "cb9ba15b-019d-48b6-9845-f941798808b6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        620,
+        60
+      ],
+      "id": "7a0d6646-c407-48e0-8371-14dbcdd18546",
+      "name": "по 1 строкe"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        200
+      ],
+      "id": "4db55b53-ab28-4ac2-9129-e67bc772ebb7",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1020,
+        220
+      ],
+      "id": "fc067694-43bc-435d-a1d2-d907a5eb4e1d",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.data }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Имя",
+              "description": "Имя кандидата из резюме"
+            },
+            {
+              "name": "Город",
+              "description": "Город проживания"
+            },
+            {
+              "name": "Образование",
+              "description": "Уровень и место образования"
+            },
+            {
+              "name": "Опыт работы",
+              "description": "Основной опыт по последним местам"
+            },
+            {
+              "name": "Навыки",
+              "description": "Упомянутые профессиональные навыки"
+            },
+            {
+              "name": "Доп. сведения",
+              "description": "Всё остальное полезное из резюме"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        60
+      ],
+      "id": "f8683721-6b24-4bc6-a9e1-6f3081910747",
+      "name": "извлечение информации"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1660,
+        200
+      ],
+      "id": "d9687a37-2b5e-47c0-97b0-06ad692d0673",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "IkJtUKNlBFnEBdXW",
+          "name": "Open AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "score",
+              "description": "0-10"
+            },
+            {
+              "name": "comment",
+              "description": "Краткий комментарий по соответствию: какие пункты из требований соблюдены, каких не хватает"
+            },
+            {
+              "name": "отправить приглашение",
+              "description": "Да или нет"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        60
+      ],
+      "id": "f3771b6b-b56d-4bb1-a8f7-de53b3bb13a6",
+      "name": "структурирование инфы"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6e7c085d-f2dd-4e91-8fc9-3227b23ac6b7",
+              "leftValue": "={{ $json['отправить приглашение'] }}",
+              "rightValue": "ДА",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        320
+      ],
+      "id": "f69fedd5-1b09-411c-b1e5-367d4e718fd8",
+      "name": "сортировка на отправку сообщения"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Чтение таблицы').item.json['отправить приглашение'] }}",
+                    "rightValue": "ДА",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f62b286f-e425-49a9-bc40-fcb6d13512d2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "скачивание"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "85d4e743-da10-4d6a-a3dd-621989bf737a",
+                    "leftValue": "={{ $('Чтение таблицы').item.json['скачано резюме'] }}",
+                    "rightValue": "https://docs.google.com/document/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notStartsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1200,
+        320
+      ],
+      "id": "48c406e9-a286-48d1-9add-a0e1e948749d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['выводы'] }}",
+        "options": {
+          "systemMessage": "=Ты — вежливый и дружелюбный AI-помощник, который помогает составить персональное сообщение для кандидата, основываясь на информации о нём.  Вот данные кандидата: {{ $json['выводы'] }}  На основе этой информации, напиши персонализированное приветственное сообщение, в котором: 1. Обратись к кандидату по имени (если указано); 2. Отметь что-то положительное из его опыта/образования; 3. Пригласи его пообщаться в Telegram; 4. Укажи ссылку на бота: @test12300098_bot  Формат: дружелюбный, профессиональный, коротко и по делу. Сообщение должно быть в 3–5 предложениях.\nНе пиши в сообщении \"спасибо за интерес проявленный к нашей вакансии\"  "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        660,
+        320
+      ],
+      "id": "9453c9fc-495c-4498-a86b-9a3fa11dd51d",
+      "name": "персональное собщение"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "чтение информации",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "чтение информации": {
+      "main": [
+        [
+          {
+            "node": "отбор непросмотренного",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "отбор непросмотренного": {
+      "main": [
+        [
+          {
+            "node": "по 1 строкe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "сбор инфы": {
+      "main": [
+        [
+          {
+            "node": "извлечение информации",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Анализ на соответствие вакансии": {
+      "main": [
+        [
+          {
+            "node": "структурирование инфы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Запись результата": {
+      "main": [
+        [
+          {
+            "node": "Чтение таблицы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "запись": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "считывание резюме": {
+      "main": [
+        [
+          {
+            "node": "читаемый вид1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "создание док-а": {
+      "main": [
+        [
+          {
+            "node": "считывание резюме",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "запись в док": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Чтение таблицы": {
+      "main": [
+        [
+          {
+            "node": "сортировка на отправку сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "персональное собщение",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "читаемый вид1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "читаемый вид1": {
+      "main": [
+        [
+          {
+            "node": "запись в док",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "создание док-а",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "по 1 строкe": {
+      "main": [
+        [
+          {
+            "node": "сбор инфы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Анализ на соответствие вакансии",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "извлечение информации",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "извлечение информации": {
+      "main": [
+        [
+          {
+            "node": "Анализ на соответствие вакансии",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "структурирование инфы",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "структурирование инфы": {
+      "main": [
+        [
+          {
+            "node": "Запись результата",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "сортировка на отправку сообщения": {
+      "main": [
+        [
+          {
+            "node": "персональное собщение",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "чтение информации",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "персональное собщение": {
+      "main": [
+        [
+          {
+            "node": "запись",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8fa418ef-2f11-4654-8e82-e3ad93e6ad1f",
+  "meta": {
+    "instanceId": "ada85f352adc11402aecccfa9e807980424bd3ca1142ded7a4f80efc1d02cbf9"
+  },
+  "id": "zi4Y2QNYST359JvR",
+  "tags": [
+    {
+      "createdAt": "2025-05-25T15:08:31.654Z",
+      "updatedAt": "2025-05-25T15:08:31.654Z",
+      "id": "rKdA4wQAB0Y66JxB",
+      "name": "liyars"
+    }
+  ]
+}
